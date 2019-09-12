@@ -110,7 +110,7 @@ function playerInputHandler(key)
 						players[i].posX -= playerW;
 
 						// Checa se houve colisão com frutas
-						playerCheckCollisionWithFruits(players[i]);
+						playerCheckCollisionWithFruits(players[i], this);
 
 						// Transmite o movimento para todos os clientes conectados.
 						io.emit('playersAtt', players);
@@ -124,7 +124,7 @@ function playerInputHandler(key)
 						players[i].posY -= playerH;
 
 						// Checa se houve colisão com frutas
-						playerCheckCollisionWithFruits(players[i]);
+						playerCheckCollisionWithFruits(players[i], this);
 
 						// Transmite o movimento para todos os clientes conectados.
 						io.emit('playersAtt', players);
@@ -138,7 +138,7 @@ function playerInputHandler(key)
 						players[i].posX += playerW;
 
 						// Checa se houve colisão com frutas
-						playerCheckCollisionWithFruits(players[i]);
+						playerCheckCollisionWithFruits(players[i], this);
 
 						// Transmite o moviemnt para todos os clientes conectados.
 						io.emit('playersAtt', players);
@@ -152,7 +152,7 @@ function playerInputHandler(key)
 						players[i].posY += playerH;
 
 						// Checa se houve colisão com frutas
-						playerCheckCollisionWithFruits(players[i]);
+						playerCheckCollisionWithFruits(players[i], this);
 
 						// Transmite o moviemnt para todos os clientes conectados.
 						io.emit('playersAtt', players);
@@ -188,7 +188,7 @@ function generateFruits() {
 	}
 }
 
-function playerCheckCollisionWithFruits(player)
+function playerCheckCollisionWithFruits(player, socket)
 {
 	var score = false;
 
@@ -209,8 +209,18 @@ function playerCheckCollisionWithFruits(player)
 			// Vamos aumentar um score pro jogador
 			player.score += 1;
 
-			// Vamos o score pro cliente atual
-			console.log(this.socket);
+			// Vamos enviar os jogadores para todos.
+			io.emit('playersAtt', players);
+
+			// Se a pontuação for um múltiplo de 10, executa um som para todos.
+			if(player.score % 10 == 0)
+			{
+				io.emit('audio', '10points');
+			}
+			else
+			{
+				socket.emit('audio', '1point');
+			}
 		}
 	}
 }

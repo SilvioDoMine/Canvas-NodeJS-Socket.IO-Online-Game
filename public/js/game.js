@@ -160,8 +160,28 @@ function updateAllPlayers(players) {
 }
 
 // Função que atualiza a lista de frutas para a atual.
-function updateAllFruits(fruits) {
+function updateAllFruits(fruits)
+{
 	fruitList = fruits;
+}
+
+function audioHandler(audio)
+{
+	switch(audio)
+	{
+		case '10points':
+			audioHandlerPlay('/audio/10points.wav');
+			break;
+		case '1point':
+				audioHandlerPlay('/audio/1point.wav');
+		default:
+	}
+}
+
+function audioHandlerPlay(url)
+{
+	var sound = new Audio(url);
+	sound.play();
 }
 
 /**
@@ -175,39 +195,7 @@ socket.on('playersAtt', updateAllPlayers);
 // Função que escuta fruitsAtt e executa a função abaixo
 socket.on('fruitsAtt', updateAllFruits);
 
-/*
-// Função que escuta a hora de ativar um efeito sonoro
-socket.on('audio', function(audio){
-	var sound_coin = document.getElementById("sound_coin");
-	var sound_oneup = document.getElementById("sound_oneup");
-	
-	switch(audio) {
-		case 'fruitCollect':
-			sound_coin.volume = 0.2;
-			if(sound_coin.ended) {
-				sound_coin.play();
-			} else {
-				sound_coin.load();
-				sound_coin.play();
-			}
-			
-			break;
-		case 'fruitCollect10':
-			sound_oneup.volume = 0.2;
-			if(sound_oneup.ended) {
-				sound_oneup.play();
-			} else {
-				sound_oneup.load();
-				sound_oneup.play();
-			}
-
-			break;
-		default:
-			// DO NOTHING
-	}
-	
-});
-*/
+socket.on('audio', audioHandler);
 
 /**
  * Inputs
