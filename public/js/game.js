@@ -48,39 +48,54 @@ class Board
 	{
 		// Varre a lista de jogadores
 		for(let i = 0; i < playerList.length; i++) {
-			// Se o jogador não for o nosso cliente, ou seja, um inimigo...
-			if(playerList[i].socketId != clientSocketId) {
-				// Então o desenha de cinza.
+			
+			// Se nosso jogador ainda não entrou no game
+			if(myPlayer == null) {
+				// Desenha todos os jogadores da lista, pois ele não está lá.
 				this.context.fillStyle = 'darkgray';
-				this.context.fillRect(playerList[i].positionX, playerList[i].positionY, playerList[i].width, playerList[i].height);
+				this.context.fillRect(playerList[i].posX, playerList[i].posY, playerWidth, playerHeight);
 
 				// Desenha o score do player, no meio dele
 				this.context.fillStyle = '#666664';
 				this.context.font = "10px Arial";
-				if(playerList[i].score >= 10) {
-					this.context.fillText(playerList[i].score, playerList[i].positionX + (playerList[i].width / 4.5), playerList[i].positionY + (playerList[i].height / 1.5));
+				if(playerList[i].score < 10) {
+					this.context.fillText(playerList[i].score, playerList[i].posX + (playerWidth / 3.0), playerList[i].posY + (playerHeight / 1.5));
 				} else {
-					this.context.fillText(playerList[i].score, playerList[i].positionX + (playerList[i].width / 3), playerList[i].positionY + (playerList[i].height / 1.5));
+					this.context.fillText(playerList[i].score, playerList[i].posX + (playerWidth / 4.5), playerList[i].posY + (playerHeight / 1.5));
+				}
+			} else {
+				// Se o nosso jogador já entrou no game, então desenhe todos, MENOS ele.
+				if(playerList[i].socketId != myPlayer.id) {
+					// Desenha todos os jogadores da lista, pois ele não está lá.
+					this.context.fillStyle = 'darkgray';
+					this.context.fillRect(playerList[i].posX, playerList[i].posY, playerWidth, playerHeight);
+
+					// Desenha o score do player, no meio dele
+					this.context.fillStyle = '#666664';
+					this.context.font = "10px Arial";
+					if(playerList[i].score < 10) {
+						this.context.fillText(playerList[i].score, playerList[i].posX + (playerWidth / 3.0), playerList[i].posY + (playerHeight / 1.5));
+					} else {
+						this.context.fillText(playerList[i].score, playerList[i].posX + (playerWidth / 4.5), playerList[i].posY + (playerHeight / 1.5));
+					}
 				}
 			}
 		}
 		
-		// Varre novamente a lista de jogadores
-		for(let i = 0; i < playerList.length; i++) {
-			// Se for o nosso cliente
-			if(playerList[i].socketId == clientSocketId) {
-				// Então o desenha de amarelo.
-				this.context.fillStyle = '#ffec75';
-				this.context.fillRect(playerList[i].positionX, playerList[i].positionY, playerList[i].width, playerList[i].height);
+		if(myPlayer != null) {
+			// Então o desenha o nosso player de amarelo.
+			this.context.fillStyle = '#ffec75';
+			this.context.fillRect(myPlayer.posX, myPlayer.posY, playerWidth, playerHeight);
 
-				// Desenha o score do player, no meio dele
-				this.context.fillStyle = '#999057';
-				this.context.font = "10px Arial";
-				if(playerList[i].score >= 10) {
-					this.context.fillText(playerList[i].score, playerList[i].positionX + (playerList[i].width / 4.5), playerList[i].positionY + (playerList[i].height / 1.5));
-				} else {
-					this.context.fillText(playerList[i].score, playerList[i].positionX + (playerList[i].width / 3), playerList[i].positionY + (playerList[i].height / 1.5));
-				}
+			// Desenha o score do player, no meio dele
+			this.context.fillStyle = '#999057';
+			this.context.font = "10px Arial";
+			// Se o score do player só tiver um digito, desenharemos no meio do quadrado.
+			if(myPlayer.score < 10) {
+				this.context.fillText(myPlayer.score, myPlayer.posX + (playerWidth / 3.0), myPlayer.posY + (playerHeight / 1.5));
+			} else {
+			// Se tiver mais de um dígito, desenharemos um pouco antes do meio, para ficar centralizado.
+				this.context.fillText(myPlayer.score, myPlayer.posX + (playerWidth / 4.5), myPlayer.posY + (playerHeight / 1.5));
 			}
 		}
 
@@ -107,28 +122,15 @@ class Board
 	}
 }
 
-class Player
-{
-	constructor(posX, posY, socketId, score)
-	{
-		this.width = 20;
-		this.height = 20;
-		this.positionX = posX;
-		this.positionY = posY;
-		this.color = 'darkgray';
-		this.socketId = socketId;
-		this.score = score;
-	}
-}
-
 var socket = io();
 var board = new Board();
-var myPlayer = null;
 var playerList = new Array();
-var clientSocketId = null;
+var myPlayer = null;
 var fruitList = new Array();
-var fruitSizeW = 20;
-var fruitSizeH = 20;
+var playerWidth = 20;
+var playerHeight = 20;
+var fruitWidth = 20;
+var fruitHeight = 20;
 var fps = 0;
 var fpsLastCalledTime = 0;
 var ping = 0;
