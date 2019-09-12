@@ -22,24 +22,6 @@ app.get('/', function(req, res){
 	res.sendFile(__dirname + '/public/index.html');
 });
 
-
-function generateRandomCanvasPixel()
-{
-    var success = false;
-    var result = 0;
-
-    while(success == false) {
-        var pixel = Math.floor(Math.random() * (canvasW - playerW));
-
-        if ((pixel % playerH) == 0) {
-            result = pixel;
-            success = true;
-        }
-    }
-
-    return result;
-}
-
 function generateRandomCanvasCoordenates(unique = false) {
 
 	var position = {
