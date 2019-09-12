@@ -127,6 +127,8 @@ var board = new Board();
 var playerList = new Array();
 var myPlayer = null;
 var fruitList = new Array();
+var canvasWidth = 460;
+var canvasHeight = 460;
 var playerWidth = 20;
 var playerHeight = 20;
 var fruitWidth = 20;
@@ -232,20 +234,36 @@ document.addEventListener('keyup', function(e){
 	// Agora vamos identificar qual tecla ele apertou:
 	switch(key) {
 		case 37:
-			// Se ele apertou setinha para esquerda
-			socket.emit('move', 'left');
+			if((myPlayer.posX - playerWidth) >= 0) {
+				// Se ele apertou setinha para esquerda, move o jogador
+				myPlayer.posX -= playerWidth; 
+				// e depois envia uma alteração de movimento pro servidor.
+				socket.emit('move', 'left');
+			}
 			break;
 		case 38:
-			// Se ele apertou setinha para cima
-			socket.emit('move', 'up');
+			if((myPlayer.posY - playerHeight) >= 0) {
+				// Se ele apertou setinha para cima, move o jogador
+				myPlayer.posY -= playerHeight; 
+				// e depois envia uma alteração de movimento pro servidor.
+				socket.emit('move', 'up');
+			}
 			break;
 		case 39:
-			// Se ele apertou setinha para direita
-			socket.emit('move', 'right');
+			if((myPlayer.posX + playerWidth) < canvasWidth) {
+				// Se ele apertou setinha para direita, move o jogador
+				myPlayer.posX += playerWidth; 
+				// e depois envia uma alteração de movimento pro servidor.
+				socket.emit('move', 'right');
+			}
 			break;
 		case 40:
-			// Se ele apertou setinha para baixo
-			socket.emit('move', 'down');
+			if((myPlayer.posY + playerHeight) < canvasHeight) {
+				// Se ele apertou setinha para baixo, move o jogador
+				myPlayer.posY += playerHeight; 
+				// e depois envia uma alteração de movimento pro servidor.
+				socket.emit('move', 'down');
+			}
 			break;
 		default:
 			// Não faz nada
