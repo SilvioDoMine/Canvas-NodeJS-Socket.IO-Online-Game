@@ -65,7 +65,7 @@ class Board
 				}
 			} else {
 				// Se o nosso jogador já entrou no game, então desenhe todos, MENOS ele.
-				if(playerList[i].socketId != myPlayer.id) {
+				if(playerList[i].id != myPlayer.id) {
 					// Desenha todos os jogadores da lista, pois ele não está lá.
 					this.context.fillStyle = 'darkgray';
 					this.context.fillRect(playerList[i].posX, playerList[i].posY, playerWidth, playerHeight);
