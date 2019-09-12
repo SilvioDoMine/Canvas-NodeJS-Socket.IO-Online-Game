@@ -9,6 +9,12 @@ var playerW = 20;
 var playerH = 20;
 var fruitsW = playerW;
 var fruitsH = playerH;
+var players = [];
+var fruits = [];
+var spawnFruits = true;
+var spawnFruitsTimer = 2000;
+var fruitsMax = 15;
+var debugMode = true;
 
 app.use(express.static('public'));
 
@@ -32,79 +38,6 @@ function generateRandomCanvasPixel()
     }
 
     return result;
-}
-
-// Gaming
-var players = new Array();
-var fruits = new Array();
-var spawnFruits = false;
-var debugMode = true;
-
-// Cria um loop, que executa a função abaixo a cada X milesegundos,
-// definido pela variável posterior a função
-setInterval(function(){
-	// Se ele puder spawnar frutas (se for verdadeiro)
-	if(spawnFruits) {
-		// Se existir pelo menos dois jogadores para brincar
-		if(players.length > 1) {
-			if(fruits.length <= 10) {
-				// Gera posições aleatórias possíveis
-				var posX = generateRandomCanvasPixel();
-				var posY = generateRandomCanvasPixel();
-				// Seleciona um tipo de fruta, ou uma "cor";
-				var colors = ["lightgreen"];
-				// Seleciona um índice randômico da array cores
-				var pickColor = Math.floor(Math.random() * colors.length);
-				
-				// Envia para a array de frutas, a nova frutinha criada.
-				fruits.push({posX: posX, posY: posY, color: colors[pickColor]});
-
-				// Transmite a array de frutas pros clientes conectados.
-				io.emit('fruitsAtt', fruits);
-				
-				if(debugMode) {
-					console.log(`Nova fruta acabou de spawnar em [${posX},${posY}]! Total: ${fruits.length}`);
-				}
-			} else {
-				if(debugMode) {
-					console.log(`Não foi possível spawnar mais uma fruta, pois foi atingido o limite de ${fruits.length} frutas em campo.`);
-				}
-			}
-		} else {
-			if(debugMode) {
-				console.log(`Não existem jogadores suficiente para jogar, o jogo está sendo reiniciado, e todas as frutas removidas.`);
-			}
-			// Se não tiver pelo menos dois jogadores, deleta todas as frutas do campo.
-			fruits = new Array();
-
-			// Transmite a array de frutas pros clientes conectados.
-			io.emit('fruitsAtt', fruits);
-		}
-	}
-
-}, 2000);
-
-function testCollisionWithFruit(player) {
-	var score = false;
-
-	// Varre a lista de frutas, e para cada..
-	for(var i = 0; i < fruits.length; i++) {
-		// Checa se o player está na posição X e Y igual a da fruta atual
-		if(fruits[i].posX == player.posX && fruits[i].posY == player.posY) {
-			// Primeiro vamos remover a fruta do campo
-			fruits.splice(i, 1);
-			// Atualize todos os clientes para saber que frutas foram atualizadas.
-			io.emit('fruitsAtt', fruits);
-			// Retorna que o player teve um score positivo.
-			score = true;
-
-			if(debugMode) {
-				console.log(`Jogador ${player.socketId} acabou de pegar uma fruta na posição [${player.posX},${player.posY}]. Total: ${player.score + 1}`);
-			}
-		}
-	}
-
-	return score;
 }
 
 function generateRandomCanvasCoordenates(unique = false) {
@@ -150,7 +83,7 @@ function playerDisconnect()
 			// Removemos o jogador exato
 			players.splice(i,1);
 
-			console.log(`O usuário ${this.id} acabou de desconectar. Jogadores atuais: ${players.length}`);
+			console.log(`CONSOLE: O usuário ${this.id} acabou de desconectar. Jogadores atuais: ${players.length}`);
 
 			// Emitimos a atualização para todos os jogadores.
 			io.emit('playersAtt', players);
@@ -176,6 +109,9 @@ function playerInputHandler(key)
 						// Move o jogador
 						players[i].posX -= playerW;
 
+						// Checa se houve colisão com frutas
+						playerCheckCollisionWithFruits(players[i]);
+
 						// Transmite o movimento para todos os clientes conectados.
 						io.emit('playersAtt', players);
 					}
@@ -186,6 +122,9 @@ function playerInputHandler(key)
 					{
 						// Move o jogador
 						players[i].posY -= playerH;
+
+						// Checa se houve colisão com frutas
+						playerCheckCollisionWithFruits(players[i]);
 
 						// Transmite o movimento para todos os clientes conectados.
 						io.emit('playersAtt', players);
@@ -198,6 +137,9 @@ function playerInputHandler(key)
 						// Move o jogador
 						players[i].posX += playerW;
 
+						// Checa se houve colisão com frutas
+						playerCheckCollisionWithFruits(players[i]);
+
 						// Transmite o moviemnt para todos os clientes conectados.
 						io.emit('playersAtt', players);
 					}
@@ -209,6 +151,9 @@ function playerInputHandler(key)
 						// Move o jogador
 						players[i].posY += playerH;
 
+						// Checa se houve colisão com frutas
+						playerCheckCollisionWithFruits(players[i]);
+
 						// Transmite o moviemnt para todos os clientes conectados.
 						io.emit('playersAtt', players);
 					}
@@ -216,6 +161,56 @@ function playerInputHandler(key)
 				default:
 					// null
 			}
+		}
+	}
+}
+
+function generateFruits() {
+	if(spawnFruits)
+	{
+		if(fruits.length < fruitsMax) {
+			var position = generateRandomCanvasCoordenates();
+			var colors = ['lightgreen'];
+			var indexPicker = Math.floor(Math.random() * colors.length);
+	
+			fruits.push({posX: position.X, posY: position.Y, color: colors[indexPicker]});
+	
+			io.emit('fruitsAtt', fruits);
+					
+			if(debugMode) {
+				console.log(`CONSOLE: Nova fruta acabou de spawnar em [${position.X},${position.Y}]! Total: ${fruits.length}`);
+			}
+		} else {
+			if(debugMode) {
+				console.log(`CONSOLE: Não foi possível gerar uma nova fruita, pois existem ${fruits.length} frutas no campo, e o limite é ${fruitsMax}.`);
+			}
+		}
+	}
+}
+
+function playerCheckCollisionWithFruits(player)
+{
+	var score = false;
+
+	// Varre a lista de frutas, e para cada...
+	for(var i = 0; i < fruits.length; i++)
+	{
+		// Checa se o player está na posição X e Y igual a da fruta atual
+		if(fruits[i].posX == player.posX && fruits[i].posY == player.posY)
+		{
+			console.log(`CONSOLE: Jogador ${player.id} pegou uma frutinha em [${fruits[i].posX},${fruits[i].posY}], e agora ele tem ${player.score + 1} pontos!`);
+
+			// Vamos remover a fruta da lista
+			fruits.splice(i, 1);
+
+			// Vamos enviar a lista com a fruta removida para todos os clientes conectados
+			io.emit('fruitsAtt', fruits);
+
+			// Vamos aumentar um score pro jogador
+			player.score += 1;
+
+			// Vamos o score pro cliente atual
+			console.log(this.socket);
 		}
 	}
 }
@@ -254,7 +249,7 @@ io.on('connection', function(socket){
 	socket.on('sendPing', function() { socket.emit('sendPong'); });
 
 
-	console.log(`O usuário de ID ${socket.id} conectou. Total de jogadores: ${players.length}`);
+	console.log(`Console: O usuário de ID ${socket.id} conectou. Total de jogadores: ${players.length}`);
 
 	// Emite para o cliente, todas as frutas spawnadas.
 	socket.emit('fruitsAtt', fruits);
@@ -266,6 +261,10 @@ io.on('connection', function(socket){
 	socket.on('disconnect', playerDisconnect);
 	
 });
+
+// Cria um loop, que executa a função abaixo a cada X milesegundos,
+// definido pela variável posterior a função
+setInterval(generateFruits, spawnFruitsTimer);
 
 http.listen(3000, function(){
 	console.log('listening on *:3000');

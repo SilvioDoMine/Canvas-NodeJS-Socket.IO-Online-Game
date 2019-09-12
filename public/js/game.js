@@ -40,7 +40,7 @@ class Board
 	{
 		for(let i = 0; i < fruitList.length; i++) {
 			this.context.fillStyle = fruitList[i].color;
-			this.context.fillRect(fruitList[i].positionX, fruitList[i].positionY, fruitSizeW, fruitSizeH);
+			this.context.fillRect(fruitList[i].posX, fruitList[i].posY, fruitWidth, fruitHeight);
 		}
 	}
 
@@ -78,6 +78,10 @@ class Board
 					} else {
 						this.context.fillText(playerList[i].score, playerList[i].posX + (playerWidth / 4.5), playerList[i].posY + (playerHeight / 1.5));
 					}
+				} else {
+					// Quando o nosso próprio jogador aparecer aqui
+					// Atualizaremos o score dele, pro score recebido.
+					myPlayer.score = playerList[i].score;
 				}
 			}
 		}
@@ -265,7 +269,6 @@ setInterval(function(){
 
 socket.on('sendPong', function(){ 
 	ping = Date.now() - startTimer;
-	console.log(ping);
 })
 
 //Game loop
