@@ -223,7 +223,7 @@ document.addEventListener('keyup', function(e){
 				// Se ele apertou setinha para esquerda, move o jogador
 				myPlayer.posX -= playerWidth; 
 				// e depois envia uma alteração de movimento pro servidor.
-				socket.emit('move', 'left');
+				socket.emit('input', 'left');
 			}
 			break;
 		case 38:
@@ -231,7 +231,7 @@ document.addEventListener('keyup', function(e){
 				// Se ele apertou setinha para cima, move o jogador
 				myPlayer.posY -= playerHeight; 
 				// e depois envia uma alteração de movimento pro servidor.
-				socket.emit('move', 'up');
+				socket.emit('input', 'up');
 			}
 			break;
 		case 39:
@@ -239,7 +239,7 @@ document.addEventListener('keyup', function(e){
 				// Se ele apertou setinha para direita, move o jogador
 				myPlayer.posX += playerWidth; 
 				// e depois envia uma alteração de movimento pro servidor.
-				socket.emit('move', 'right');
+				socket.emit('input', 'right');
 			}
 			break;
 		case 40:
@@ -247,7 +247,7 @@ document.addEventListener('keyup', function(e){
 				// Se ele apertou setinha para baixo, move o jogador
 				myPlayer.posY += playerHeight; 
 				// e depois envia uma alteração de movimento pro servidor.
-				socket.emit('move', 'down');
+				socket.emit('input', 'down');
 			}
 			break;
 		default:

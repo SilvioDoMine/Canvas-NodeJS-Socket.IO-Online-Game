@@ -158,7 +158,7 @@ function playerDisconnect()
 	}
 }
 
-function playerMovementHandler(key)
+function playerInputHandler(key)
 {
 	// Varremos a lista de jogadores
 	for(var i = 0; i < players.length; i++)
@@ -260,7 +260,7 @@ io.on('connection', function(socket){
 	socket.emit('fruitsAtt', fruits);
 
 	// Ao receber uma informação de move (movimento) do socket (cliente)...
-	socket.on('move', playerMovementHandler);
+	socket.on('input', playerInputHandler);
 
 	// Quando um jogador desconecta, ele deve ser removido.
 	socket.on('disconnect', playerDisconnect);
