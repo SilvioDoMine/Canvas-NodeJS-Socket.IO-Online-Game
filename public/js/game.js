@@ -253,10 +253,12 @@ document.addEventListener('keyup', function(e){
 
 });
 
+// NOTA: Essa não é a melhor forma de fazê-lo, o ideal seria o ping ser do servidor pro cliente,
+// e não do cliente pro servidor. ;)
 setInterval(function(){
 	startTimer = Date.now();
 	socket.emit('sendPing');
-}, 80);
+}, 2000);
 
 socket.on('sendPong', function(){ 
 	ping = Date.now() - startTimer;

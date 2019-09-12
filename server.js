@@ -190,6 +190,8 @@ io.on('connection', function(socket){
 
 	io.emit('playersAtt', players);
 
+	socket.on('sendPing', function() { socket.emit('sendPong'); });
+
 	/*
 	// Gera uma uma posição X e Y randômica e válida para um jogador
 	var posX = generateRandomCanvasPixel();
@@ -212,9 +214,7 @@ io.on('connection', function(socket){
 	// Emite para todos os jogadores, a lista de jogadores atual.
 	io.emit('playersAtt', players);
 
-	socket.on('sendPing', function() {
-		socket.emit('sendPong');
-	});
+	
 
 	// Ao receber uma informação de move (movimento) do socket (cliente)...
 	socket.on('move', function(key) {
