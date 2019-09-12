@@ -7,6 +7,8 @@ var canvasW = 460;
 var canvasH = 460;
 var playerW = 20;
 var playerH = 20;
+var fruitsW = playerW;
+var fruitsH = playerH;
 
 app.use(express.static('public'));
 
@@ -151,6 +153,8 @@ io.on('connection', function(socket){
 		canvasH: canvasH,
 		playerW: playerW,
 		playerH: playerH,
+		fruitsW: fruitsW,
+		fruitsH: fruitsH,
 		player: {
 			posX: position.X,
 			posY: position.Y,
