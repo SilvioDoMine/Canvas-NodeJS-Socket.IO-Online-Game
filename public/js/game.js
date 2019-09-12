@@ -138,21 +138,6 @@ var fpsLastCalledTime = 0;
 var ping = 0;
 var startTimer;
 
-function sound(src) {
-	this.sound = document.createElement("audio");
-	this.sound.src = src;
-	this.sound.setAttribute("preload", "auto");
-	this.sound.setAttribute("controls", "none");
-	this.sound.style.display = "none";
-	document.body.appendChild(this.sound);
-	this.play = function(){
-	  this.sound.play();
-	}
-	this.stop = function(){
-	  this.sound.pause();
-	}
-}
-
 /************
  * Funções
  ***********/
@@ -221,7 +206,7 @@ socket.on('audio', function(audio){
 */
 
 /**
- * Funções do jogo
+ * Inputs
  */
 
 // Atualização do movimento: adiciona um escutador de evento, que executará
