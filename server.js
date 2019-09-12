@@ -139,6 +139,25 @@ function generateRandomCanvasCoordenates(unique = false) {
     return position;
 }
 
+function playerDisconnect()
+{
+	// Varre a lista de jogadores
+	for(i = 0; i < players.length; i++)
+	{
+		// Se o id do jogador que estamos varrendo, for igual ao do cliente que desconectou...
+		if(players[i].id == this.id)
+		{
+			// Removemos o jogador exato
+			players.splice(i,1);
+
+			console.log(`O usuário ${this.id} acabou de desconectar. Jogadores atuais: ${players.length}`);
+
+			// Emitimos a atualização para todos os jogadores.
+			io.emit('playersAtt', players);
+		}
+	}
+}
+
 /*************
  * Networking
  ************* */
@@ -148,7 +167,7 @@ io.on('connection', function(socket){
 
 	var position = generateRandomCanvasCoordenates();
 
-	var data = {
+	let data = {
 		canvasW: canvasW,
 		canvasH: canvasH,
 		playerW: playerW,
@@ -294,22 +313,11 @@ io.on('connection', function(socket){
 		
 	});
 
-	// When a player disconnects, should be removed.
-	socket.on('disconnect', function(){
-		
-		for(i = 0; i < players.length; i++) {
-			if(players[i].socketId == socket.id) {
-				players.splice(i,1);
-				
-				if(debugMode) {
-					console.log(`O usuário ${socket.id} acabou de desconectar. Jogadores atuais: ${players.length}`);
-				}
-
-				io.emit('playersAtt', players);
-			}
-		}
-	});
 	*/
+
+	// Quando um jogador desconecta, ele deve ser removido.
+	socket.on('disconnect', playerDisconnect);
+	
 });
 
 http.listen(3000, function(){
