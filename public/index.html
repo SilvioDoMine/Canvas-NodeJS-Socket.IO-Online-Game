@@ -9,9 +9,77 @@
     canvas {
         border:1px solid #000;
     }
+    .chatbox {
+        margin-top:-3px;
+        width: 300px;
+        height: 460px;
+        background-color: #ddd;
+        border: 1px solid #000;
+    }
+    #chatbox-content {
+        border: 1px solid #999;
+        width: 257px;
+        height: 360px;
+        padding: 10px;
+        background-color: white;
+        margin-left: 10px;
+        margin-top: 10px;
+        overflow: auto;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 12px;
+    }
+    #chatbox-type {
+        padding: 5px;
+        margin-top:10px;
+        border: 1px solid #999;
+        height: 37px;
+        margin-left: 10px;
+        width: 210px;
+        background-color: white;
+        resize: none;
+    }
+    .chatbox-send {
+        margin-top: -53px;
+        margin-left: 240px;
+    }
+    #send-button {
+        width: 49px;
+        height: 49px;
+        background-color: white;
+        border: 1px solid #999;
+        font-size: 9px;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+    .system {
+        font-style: italic;
+        font-weight: bold;
+        color:#999;
+        text-align: center;
+    }
     </style>
 </head>
 <body>
+    <center>
+        <table>
+            <th>
+                <td id="canvas"></td>
+                <td id="chat">
+                    <div class="chatbox">
+                        <div id="chatbox-content">
+                        </div>
+                        <div>
+                            <textarea id="chatbox-type"></textarea>
+                        </div>
+                        <div class="chatbox-send">
+                            <button type="button" id="send-button">enviar</button>
+                        </div>
+                        
+                    </div>
+                </td>
+            </th>
+        </table>
+    </center>
 
     <script src="/socket.io/socket.io.js/"></script>
     <script src="/js/game.js"></script>

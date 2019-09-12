@@ -69,6 +69,8 @@ function playerDisconnect()
 
 			// Emitimos a atualização para todos os jogadores.
 			io.emit('playersAtt', players);
+
+			this.broadcast.emit('systemChat', `Usuário ${this.id} saiu do jogo.`);
 		}
 	}
 }
@@ -233,6 +235,8 @@ io.on('connection', function(socket){
 	}
 
 	socket.emit('init', data);
+
+	socket.broadcast.emit('systemChat', `Usuário ${socket.id} acabou de entrar no jogo.`);
 
 	players.push(data.player);
 

@@ -8,20 +8,21 @@ class Board
 		this.init();
 	}
 
+	init()
+	{
+		var div = document.getElementById('canvas');
+		this.canvas = document.createElement("canvas");
+		this.canvas.width = this.width;
+		this.canvas.height = this.height;
+		div.appendChild(this.canvas);
+		this.getContext();
+		
+	}
+
 	getContext()
 	{
 		this.context = this.canvas.getContext("2d");
 		return this.context;
-	}
-
-	init()
-	{
-		this.canvas = document.createElement("canvas");
-		this.canvas.width = this.width;
-		this.canvas.height = this.height;
-		document.body.appendChild(this.canvas);
-		this.getContext();
-		
 	}
 
 	draw()
@@ -126,6 +127,7 @@ class Board
 	}
 }
 
+var chatBox = document.getElementById("chatbox-content");
 var socket = io();
 var board = new Board();
 var playerList = new Array();
@@ -184,6 +186,15 @@ function audioHandlerPlay(url)
 	sound.play();
 }
 
+function chatHandlerSystem(message)
+{
+	var node = document.createElement('p');
+	var text = document.createTextNode(`${message}`);
+	node.appendChild(text);
+	node.className += "system";
+	chatBox.appendChild(node);
+}
+
 /**
  * Networking with socket ID
  */
@@ -194,6 +205,8 @@ socket.on('playersAtt', updateAllPlayers);
 
 // Função que escuta fruitsAtt e executa a função abaixo
 socket.on('fruitsAtt', updateAllFruits);
+
+socket.on('systemChat', chatHandlerSystem);
 
 socket.on('audio', audioHandler);
 
