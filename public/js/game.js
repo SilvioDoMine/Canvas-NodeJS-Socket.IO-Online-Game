@@ -128,6 +128,7 @@ class Board
 }
 
 var chatBox = document.getElementById("chatbox-content");
+var chatInput = document.getElementById("chatbox-type");
 var socket = io();
 var board = new Board();
 var playerList = new Array();
@@ -195,6 +196,56 @@ function chatHandlerSystem(message)
 	chatBox.appendChild(node);
 }
 
+function chatHandlerPlayer(message, id)
+{
+	var p = document.createElement('p');
+	var span = document.createElement('span');
+	var spanText = document.createTextNode(`${id}: `);
+	var pText = document.createTextNode(message);
+
+	if(id == myPlayer.id) {
+		span.className += "myself";
+	}
+
+	span.appendChild(spanText);
+	p.appendChild(span);
+	p.appendChild(pText);
+	chatBox.appendChild(p);
+	
+	chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+// Aqui vai lidar com o que o cliente escuta na área do chat
+function chatHandler(message)
+{
+	var key = message.keyCode;
+	
+	switch(key)
+	{
+		case 13:
+			chatHandlerSend();
+			break;
+		default:
+			// null
+	}
+}
+
+// Envia a mensagem pro servidor.
+function chatHandlerSend()
+{
+	if(chatInput.value.length > 0)
+	{
+		// Armazena o valor numa variável
+		var message = chatInput.value;
+
+		// Apaga o campo
+		chatInput.value = "";
+
+		// Envia pro servidor.
+		socket.emit('playerChat', message);
+	}
+}
+
 /**
  * Networking with socket ID
  */
@@ -208,11 +259,16 @@ socket.on('fruitsAtt', updateAllFruits);
 
 socket.on('systemChat', chatHandlerSystem);
 
+socket.on('playerChat', chatHandlerPlayer);
+
 socket.on('audio', audioHandler);
 
 /**
  * Inputs
  */
+
+// Escuta tudo que ele fizer no campo de digitar.
+chatInput.addEventListener('keyup', chatHandler);
 
 // Atualização do movimento: adiciona um escutador de evento, que executará
 // a função abaixo quando o evento "keyup" (Pressionar tecla) for ativado, passando
@@ -255,7 +311,11 @@ document.addEventListener('keyup', function(e){
 				socket.emit('input', 'down');
 			}
 			break;
+		case 13:
+			// Caso ele aperte enter, foca no chat.
+			chatInput.focus();
 		default:
+			//console.log(key);
 			// Não faz nada
 	}
 

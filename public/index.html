@@ -57,6 +57,12 @@
         color:#999;
         text-align: center;
     }
+    span {
+        font-weight: bold;
+    }
+    .myself {
+        color: yellow;
+    }
     </style>
 </head>
 <body>
@@ -69,7 +75,7 @@
                         <div id="chatbox-content">
                         </div>
                         <div>
-                            <textarea id="chatbox-type"></textarea>
+                            <textarea id="chatbox-type" onkeypress="if(event.keyCode==13){return false;}"></textarea>
                         </div>
                         <div class="chatbox-send">
                             <button type="button" id="send-button">enviar</button>

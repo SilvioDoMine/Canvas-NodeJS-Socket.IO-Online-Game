@@ -209,6 +209,12 @@ function playerCheckCollisionWithFruits(player, socket)
 	}
 }
 
+function chatHandler(message)
+{
+	// Devolve a mensagem pra todos os jogadores, inclusive ele.
+	io.emit('playerChat', message, this.id);
+}
+
 /*************
  * Networking
  ************* */
@@ -252,6 +258,9 @@ io.on('connection', function(socket){
 
 	// Ao receber uma informação de move (movimento) do socket (cliente)...
 	socket.on('input', playerInputHandler);
+
+	// Ao receber uma informação de chat, executa chathandler();
+	socket.on('playerChat', chatHandler);
 
 	// Quando um jogador desconecta, ele deve ser removido.
 	socket.on('disconnect', playerDisconnect);
