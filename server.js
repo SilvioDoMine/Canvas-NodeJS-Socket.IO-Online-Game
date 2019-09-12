@@ -158,6 +158,68 @@ function playerDisconnect()
 	}
 }
 
+function playerMovementHandler(key)
+{
+	// Varremos a lista de jogadores
+	for(var i = 0; i < players.length; i++)
+	{
+		// Dentro dessa lista, vamos procurar o jogador que pressionou a tecla.
+		if(players[i].id == this.id)
+		{
+			// Agora vamos procurar que tecla ele apertou
+			switch(key)
+			{
+				case 'left':
+					// Verificamos se após o movimento, ele vai passar da parede, se não..
+					if((players[i].posX - playerW) >= 0)
+					{
+						// Move o jogador
+						players[i].posX -= playerW;
+
+						// Transmite o movimento para todos os clientes conectados.
+						io.emit('playersAtt', players);
+					}
+					break;
+				case 'up':
+					// Verificamos se após o movimento, ele vai passar da parede, se não...
+					if((players[i].posY - playerH) >= 0)
+					{
+						// Move o jogador
+						players[i].posY -= playerH;
+
+						// Transmite o movimento para todos os clientes conectados.
+						io.emit('playersAtt', players);
+					}
+					break;
+				case 'right':
+					// Verificamos se após o movimento, ele vai passar da parede, se não...
+					if((players[i].posX + playerW) < canvasW)
+					{
+						// Move o jogador
+						players[i].posX += playerW;
+
+						// Transmite o moviemnt para todos os clientes conectados.
+						io.emit('playersAtt', players);
+					}
+					break;
+				case 'down':
+					// Verificamos se após o movimento, ele vai passar da parede, se não...
+					if((players[i].posY + playerH) < canvasH)
+					{
+						// Move o jogador
+						players[i].posY += playerH;
+
+						// Transmite o moviemnt para todos os clientes conectados.
+						io.emit('playersAtt', players);
+					}
+					break;
+				default:
+					// null
+			}
+		}
+	}
+}
+
 /*************
  * Networking
  ************* */
@@ -186,134 +248,19 @@ io.on('connection', function(socket){
 	socket.emit('init', data);
 
 	players.push(data.player);
-	console.log(players);
 
 	io.emit('playersAtt', players);
 
 	socket.on('sendPing', function() { socket.emit('sendPong'); });
 
-	/*
-	// Gera uma uma posição X e Y randômica e válida para um jogador
-	var posX = generateRandomCanvasPixel();
-	var posY = generateRandomCanvasPixel();
 
-	// Envia para a array de jogadores, o novo jogador, com sua respectiva posição e id
-	players.push({posX: posX, posY: posY, socketId: socket.id, score: 0});
-
-	// Emite mensagem no console do servidor.
 	console.log(`O usuário de ID ${socket.id} conectou. Total de jogadores: ${players.length}`);
-
-	// Emite para o cliente, o ID do próprio cliente.
-	socket.emit('id', socket.id);
-
-	// Emite um pong para o cliente, para enviar o primeir ping
 
 	// Emite para o cliente, todas as frutas spawnadas.
 	socket.emit('fruitsAtt', fruits);
 
-	// Emite para todos os jogadores, a lista de jogadores atual.
-	io.emit('playersAtt', players);
-
-	
-
 	// Ao receber uma informação de move (movimento) do socket (cliente)...
-	socket.on('move', function(key) {
-		// Varre a lista de jogadores
-		for(var i = 0; i < players.length; i++) {
-			// E procura o jogador que pressionou a tecla
-			if(players[i].socketId == socket.id) {
-				// Vamos verificar qual tecla foi pressionada
-				switch(key) {
-					case 'left':
-						// Se o jogador puder se mexer o suficiente para não sair da tela, ou seja,
-						// se o valor não ficar negativo, então é possível mexê-lo.
-						if((players[i].posX - playerW) >= 0) {
-							// Faz o jogador se mover a um pixel de jogador para a esquerda;
-							players[i].posX -= playerW;
-							// Chama a função que testa a colisão com uma fruta.
-							if(testCollisionWithFruit(players[i])) {
-								// Se a colisão aconteceu, aumenta um ponto para o jogador.
-								players[i].score += 1;
-								// Se o jogador fez pontuação igual a múltiplo de 10
-								if(players[i].score % 10 == 0) {
-									// Emite som para todos
-									io.emit('audio', 'fruitCollect10');
-									console.log('DEBUG: Emitindo som pra todos.')
-								} else {
-									// Emite som só pra ele
-									socket.emit('audio', 'fruitCollect');
-									console.log('DEBUG: Emitindo som pro cliente.');
-								}
-							}
-							// Emit this update to everyone
-							io.emit('playersAtt', players);
-						}
-						break;
-					case 'up':
-						if((players[i].posY - playerH) >= 0) {
-							players[i].posY -= playerH;
-							if(testCollisionWithFruit(players[i])) {
-								players[i].score += 1;
-								// Se o jogador fez pontuação igual a múltiplo de 10
-								if(players[i].score % 10 == 0) {
-									// Emite som para todos
-									io.emit('audio', 'fruitCollect10');
-									console.log('DEBUG: Emitindo som pra todos.')
-								} else {
-									// Emite som só pra ele
-									socket.emit('audio', 'fruitCollect');
-									console.log('DEBUG: Emitindo som pro cliente.');
-								}
-							}
-							io.emit('playersAtt', players);
-						}
-						break;
-					case 'right':
-						if((players[i].posX + playerW) < canvasW) {
-							players[i].posX += playerW;
-							if(testCollisionWithFruit(players[i])) {
-								players[i].score += 1;
-								// Se o jogador fez pontuação igual a múltiplo de 10
-								if(players[i].score % 10 == 0) {
-									// Emite som para todos
-									io.emit('audio', 'fruitCollect10');
-									console.log('DEBUG: Emitindo som pra todos.')
-								} else {
-									// Emite som só pra ele
-									socket.emit('audio', 'fruitCollect');
-									console.log('DEBUG: Emitindo som pro cliente.');
-								}
-							}
-							io.emit('playersAtt', players);
-						}
-						break;
-					case 'down':
-						if((players[i].posY + playerH) < canvasH) {
-							players[i].posY += playerH;
-							if(testCollisionWithFruit(players[i])) {
-								players[i].score += 1;
-								// Se o jogador fez pontuação igual a múltiplo de 10
-								if(players[i].score % 10 == 0) {
-									// Emite som para todos
-									io.emit('audio', 'fruitCollect10');
-									console.log('DEBUG: Emitindo som pra todos.')
-								} else {
-									// Emite som só pra ele
-									socket.emit('audio', 'fruitCollect');
-									console.log('DEBUG: Emitindo som pro cliente.');
-								}
-							}
-							io.emit('playersAtt', players);
-						}
-						break;
-					default:
-				}
-			}
-		}
-		
-	});
-
-	*/
+	socket.on('move', playerMovementHandler);
 
 	// Quando um jogador desconecta, ele deve ser removido.
 	socket.on('disconnect', playerDisconnect);
